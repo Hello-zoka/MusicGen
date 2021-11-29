@@ -2,12 +2,10 @@ from telebot import TeleBot
 import generator
 import database
 import wave
-import requests # request нужен для загрузки файлов от пользователя
+import requests  # request нужен для загрузки файлов от пользователя
 import os
-import random
 
-
-token = '2086005166:AAFMFBM38e3eXiPp-mG79CfEbegfB36Cvec'
+token = ''  # TODO insert your tg bot token
 bot = TeleBot(token)
 
 
@@ -22,22 +20,30 @@ def get_text_messages(message):
     print("Message from user: ", message.from_user.first_name)
     if message.text == "1":
         bot.send_message(message.from_user.id, "Cooking up....")
-        list_of_dir = ["Samples/Cymbals", "Samples/Kick Drums", "Samples/Claps", "Samples/808s"]
+        list_of_dir = ["Samples/Cymbals", "Samples/Kick Drums", "Samples/Claps",
+                       "Samples/808s"]  # Choosing random samples
         list_of_samples_names = [generator.get_random_file(i) for i in list_of_dir]
-        # for i in list_of_samples_names:
-        #     print("FILE: ", i)
         list_samp = generator.readSamples(list_of_samples_names)
-        instrumental, sample_rate, sample_width = generator.read_wav(generator.get_random_file("Samples2"))
+        instrumental, sample_rate, sample_width = generator.read_wav(
+            generator.get_random_file("Samples2"))  # Choosing random melody
         channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
         generator.write_wav("bot_result.wav", channels_out, 44100, 2)
         bot.send_audio(message.from_user.id, audio=open("bot_result.wav", 'rb'))
     if message.text == "2":
-        bot.send_message(message.from_user.id, "Ого, а ты творец! Скидывай мне в сообщения файлы в формате .wav(не сжатые, иначе я их проигнорирую), а когда закончишь - напиши мне '3' и я скину результат")
+        bot.send_message(message.from_user.id,
+                         "Ого, а ты творец! Скидывай мне в сообщения файлы в формате .wav"
+                         "(не сжатые, иначе я их не смогу обработать), "
+                         "а когда закончишь - напиши мне '3' и я скину результат")
+        bot.send_message(message.from_user.id,
+                     'Пожалуйста не отправляйте длинные файлы, иначе я их обрежу! 3-7 секунд более чем достаточно, надо заливать состовляющие, а не целые симфонии)')
+
     if message.text == "3":
         list_of_samples_names = database.get_by_id(message.from_user.id)
         database.clear(message.from_user.id)
         if len(list_of_samples_names) == 0:
-            bot.send_message(message.from_user.id, "Ты не отправил файлы или что-то сломалось;( А еще я медленный, так что может быть просто не успел все обработать")
+            bot.send_message(message.from_user.id,
+                             "Ты не отправил файлы или что-то сломалось;("
+                             "А еще я медленный, так что может быть просто не успел все обработать\nЯ скажу, когда получу файлы, не спеши.")
             return
 
         bot.send_message(message.from_user.id, "Try to open your files....")
@@ -48,7 +54,6 @@ def get_text_messages(message):
         # channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
         generator.write_wav("bot_result.wav", generator.generate_music(list_samp), 44100, 2)
         bot.send_audio(message.from_user.id, audio=open("bot_result.wav", 'rb'))
-
 
 
 @bot.message_handler(content_types=["audio"])
@@ -70,6 +75,7 @@ def handle_docs_document(message):
     database.insert(message.from_user.id, filename)
     bot.send_message(message.from_user.id, "Я скушал твой файл))")
 
+
 @bot.message_handler(content_types=["document"])
 def handle_docs_document(message):
     print("Document from user:", message.from_user.first_name)
@@ -82,10 +88,13 @@ def handle_docs_document(message):
         f.write(file.content)
     try:
         wav_file = wave.open(filename, 'r')
+
     except wave.Error:
-        print("Incorret file" + filename)
+        print("Incorret file " + filename)
         bot.send_message(message.from_user.id, "Ну и что за хрень ты скинул, да еще и документ а не аудио?")
         return
     database.insert(message.from_user.id, filename)
     bot.send_message(message.from_user.id, "Я скушал твой файл))")
+
+
 bot.polling(none_stop=True, interval=0)

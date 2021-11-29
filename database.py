@@ -8,7 +8,7 @@ except:
     print("Error connection")
     exit()
 
-
+# need to create postgresql database at first launch
 # try:
 #     cursor.execute('''CREATE TABLE audio(id varchar(40), listOfPaths varchar(200));''')
 #     conn.commit()
@@ -27,23 +27,21 @@ def insert(id, path):
 
 def get_by_id(id):
     id = str(id)
+    result = []
     try:
         cursor.execute("SELECT * FROM audio WHERE id = '" + id + "'")
-        # cursor.execute('''INSERT INTO audio(id, listOfPaths) VALUES(%s, %s)''', (id, path))
         rows = cursor.fetchall()
-        result = []
         for row in rows:
             result.append(row[1])
         conn.commit()
-        # print("gotcha!")
-        return result
     except:
         print("Error get by id")
+    return result
+
 def clear(id):
     id = str(id)
     try:
         cursor.execute("DELETE FROM audio WHERE id = '" + id + "'")
-        # cursor.execute('''INSERT INTO audio(id, listOfPaths) VALUES(%s, %s)''', (id, path))
         conn.commit()
     except:
         print("Error while deleting")

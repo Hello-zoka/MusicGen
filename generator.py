@@ -1,35 +1,8 @@
 #!/usr/bin/env python3
-
 import wave
 import random
 import os
-# import numpy as np
-# import subprocess
-# import sounddevice as sd  # for opening bad wav files
-# import scipy.io.wavfile as wavee
 
-# Шаблон для обработки звука.
-#
-# В секции "вспомогательный код" внизу файла уже написаны функции для чтения
-# и записи .wav файлов (read_wav и write_wav).
-#
-# В основной функции main:
-# 1. Читается .wav файл, путь к которому указан в переменной INPUT_FILE
-# 2. Вызывается функция process, которая должна обработать сигнал и вернуть
-#    результат обработки
-# 3. Результат проверяется на корректность (количество каналов, равное количество
-#    сэмплов в канале и т.д.)
-# 4. Результат записывается в .wav файл, путь к которому указан в переменной
-#    OUTPUT_FILE
-#
-# Как сделать новый фильтр:
-# 1. Определить новую функцию, используя change_amp как пример
-# 2. Изменить функцию process, чтобы она использовала новый фильтр для обработки
-#    и возвращала результат
-# 3. Если вы хотите применить к исходному сигналу несколько разных фильтров,
-#    то можно последовательно вызвать эти фильтры в функции process
-
-# Тут можно поменять пути к входному и результирующему файлам
 INPUT_FILE = "Samples2/MV2 - STR Vibra.wav"
 INPUT_FILE2 = "sounds/mad-world.wav"
 INPUT_FILE_LIST = ["Samples/Cymbals/Hihat Closed 031 Super Hero Music.wav", "Samples/Claps/Clap 018 Cardiak.wav",
@@ -38,31 +11,30 @@ INPUT_FILE_LIST = ["Samples/Cymbals/Hihat Closed 031 Super Hero Music.wav", "Sam
 OUTPUT_FILE = "not_so_random.wav"
 
 
+# SOME USELESS NOTES ABOUT GENERATION
 # HiHat smth - fast / / / / // / / // / // //
 # Kick - 2
-# snare
-# Bass
+# snare - 3
+# Bass - Not so fast, can damage a lot
 # Clap - 1
-# Melody - TODO
+# Melody - can't generate this so easy
 
-def get_random_file(directory):
+def get_random_file(directory):  # Getting path to random file in directory
     n = 0
     random.seed()
     for root, dirs, files in os.walk(directory):
         for name in files:
             n += 1
-            if random.uniform(0, n) < 1: rfile = os.path.join(root, name)
+            if random.uniform(0, n) < 1:
+                rfile = os.path.join(root, name)
     return rfile
 
 
-def sum_of_channels(channels, channels2):
-    # Двумерный список для результирующего сигнала такого же размера, как channels
-    # Если  в сhannels2 больше, то очень жаль
+def sum_of_channels(channels, channels2):  # getting sum of two audio lines
     if len(channels[0]) < len(channels2[0]):
         channels, channels2 = channels2, channels
     result = [[0] * len(ch) for ch in channels]
 
-    # Код для обработки аудио-сигнала.
     n_channels = len(channels)
     for k in range(n_channels):
         for i in range(len(channels[k])):
@@ -72,10 +44,7 @@ def sum_of_channels(channels, channels2):
     return result
 
 
-def sum_of_channels_from_pos(channels, channels2, pos):
-    # Двумерный список для результирующего сигнала такого же размера, как channels
-    # Если  в сhannels2 больше, то очень жаль
-    # Код для обработки аудио-сигнала.
+def sum_of_channels_from_pos(channels, channels2, pos):  # add second audio line to the first from pos position
     n_channels = len(channels)
     for k in range(n_channels):
         for i in range(len(channels2[k])):
@@ -87,25 +56,17 @@ def sum_of_channels_from_pos(channels, channels2, pos):
     return channels
 
 
-def concatenate_of_channles(channel, channel2):
+def concatenate_of_channles(channel, channel2):  # concatenate two audios
     for i in range(len(channel)):
         for j in channel2[i]:
             channel[i].append(j)
     return channel
 
 
-def try_make_beat(channel, sample_rate=44800):
-    length = len(channel[0]) // sample_rate  # seconds
-    k = sample_rate // 4
-    dop = [[0 for i in range(k)] for j in range(len(channel))]
-    # print(dop)
-    dop = concatenate_of_channles(dop, channel)
-    return sum_of_channels(dop, channel)
-
-
+# Making loop with random pauses(from pause_time list) between beats. There are beats_count  beatsin one lopp.
+# Then looping it up to duration time
 def random_mix_of_beat(channel, sample_rate=44100, beats_count=5, duration=20, pause_time=[0.4, 0.6, 0.8, 1.]):
     # print("Starting another sample...")
-
     pause_len = [int(pause_time[i] * sample_rate) for i in range(len(pause_time))]
     random_pause = [pause_len[random.randint(0, len(pause_len) - 1)] for i in range(beats_count)]
     loop_duration = 0
@@ -118,42 +79,23 @@ def random_mix_of_beat(channel, sample_rate=44100, beats_count=5, duration=20, p
     delay = 0
     for cur_pause in random_pause:
         delay += cur_pause
-        # dop2 = [[0 for i in range(delay)] for j in range(len(channel))]
-        # dop2 = concatenate_of_channles(dop2, channel)
-        # result = sum_of_channels(result, dop2)
         result = sum_of_channels_from_pos(result, channel, delay)
     # print("End Sample")
     return clear_back(result)
 
 
-def generate_music(list_of_channels, duration=10):
+def generate_music(list_of_channels, duration=20):  # getting list of audios and generating random beat
     result = [[], []]
     for i in range(len(list_of_channels)):
         channel = list_of_channels[i]
         pause_time = [0.4, 0.6, 0.8, 0.8, 0.9, 1., 1.1]
-
-        # for generating smth not so random
-        # if i == 0: # Hi Hat
-        #     pause_time = [0.2, 0.2, 0.2, 0.2, 0.3, 0.1, 0.1]
-        # elif i == 1: # Clap
-        #     pause_time = [0.5, 0.7, 0.7, 0.8, 0.9, 0.9, 1.2, 1.]
-        # elif i == 2: # Kick
-        #     pause_time = [2.5, 3.1, 2.1]
-        # elif i == 3: # Bass
-        #     pause_time = [0.8, 0.8, 0.9, 1., 1.1]
-
-        loop_sample = clear_back(random_mix_of_beat(channel, beats_count=10, pause_time=pause_time))
-        loop = loop_sample
-        # for i in range(2):
-        # loop = concatenate_of_channles(loop, loop_sample)
-        # print("kek", i)
-
-        result = sum_of_channels(loop, result)
-
+        loop_sample = clear_back(random_mix_of_beat(channel, duration=duration, beats_count=10, pause_time=pause_time))
+        result = sum_of_channels(loop_sample, result)
     return result
 
 
-def generate_notrnd_music(list_of_channels, duration=10):
+def generate_notrnd_music(list_of_channels,
+                          duration=20):  # same as generate_music but trying to make smth not so random and pretty
     result = [[], []]
     for i in range(len(list_of_channels)):
         channel = list_of_channels[i]
@@ -169,18 +111,13 @@ def generate_notrnd_music(list_of_channels, duration=10):
         elif i == 3:  # Bass
             pause_time = [0.8, 0.8, 0.9, 1., 1.1]
 
-        loop_sample = clear_back(random_mix_of_beat(channel, beats_count=10, pause_time=pause_time))
-        loop = loop_sample
-        # for i in range(2):
-        # loop = concatenate_of_channles(loop, loop_sample)
-        # print("kek", i)
-
-        result = sum_of_channels(loop, result)
+        loop_sample = clear_back(random_mix_of_beat(channel, duration=duration, beats_count=10, pause_time=pause_time))
+        result = sum_of_channels(loop_sample, result)
 
     return result
 
 
-def clear_back(channel):
+def clear_back(channel):  # deleting silence from the end
     bl = True
     while bl:
         for i in channel:
@@ -194,7 +131,17 @@ def clear_back(channel):
     return channel
 
 
-def readSamples(list_of_samples=INPUT_FILE_LIST):
+def cut_big_file(channels, sample_rate = 44100, max_duration = 5):
+    result = [[] for i in range(len(channels))]
+    mx_len = sample_rate * max_duration
+    for i in range(len(channels)):
+        for j in range(min(mx_len, len(channels[i]))):
+            result[i].append(channels[i][j])
+    return result
+
+
+
+def readSamples(list_of_samples=INPUT_FILE_LIST):  # reading audio lines from list of files
     res = []
     for i in list_of_samples:
         channels, sample_rate, sample_width = read_wav(i)
@@ -202,32 +149,12 @@ def readSamples(list_of_samples=INPUT_FILE_LIST):
     return res
 
 
-def main():
-    instrumental, sample_rate, sample_width = read_wav(INPUT_FILE)
-    # channels2, sample_rate2, sample_width2 = read_wav(INPUT_FILE2)
-
-    # print('Обработка... ', end='')
-    list_samp = readSamples()
-
-    channels_out = sum_of_channels(generate_music(list_samp), instrumental)
-
-    # channels_out = concatenate_of_channles(channels, channels2)
-    #
-    if not check_result(channels_out):
-        return
-    # print('Готово')
-    write_wav(OUTPUT_FILE, channels_out, 44100, 2)
-
-
 ################################################################################
-# Вспомогательный код
+# Вспомогательный код, основа взята у Артема Таболина https://github.com/citxx/dsp-class
 ################################################################################
 
 
 def read_wav(filename):
-    # myrecording = sd.rec(int(5 * 44100), samplerate=44100, channels=2)
-    # sd.wait()  # Wait until recording is finished
-    # wavee.write(filename, 44100, myrecording.astype(np.int16))
     try:
         wav_file = wave.open(filename, 'r')
     except wave.Error:
@@ -295,11 +222,9 @@ def check_result(channel_samples):
             return False
 
     # TODO: слишком большие сэмплы
-
     return True
 
 
 def bounds_for_sample_width(sample_width):
     power = 1 << (8 * sample_width - 1)
     return -power, power - 1
-
