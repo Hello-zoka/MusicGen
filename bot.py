@@ -4,8 +4,9 @@ import database
 import wave
 import requests  # request нужен для загрузки файлов от пользователя
 import os
+import config  # hiding BotToken
 
-token = ''  # TODO insert your tg bot token
+token = config.token  # TODO insert your tg bot token
 bot = TeleBot(token)
 
 
@@ -23,7 +24,7 @@ def get_text_messages(message):
         list_of_dir = ["Samples/Cymbals", "Samples/Kick Drums", "Samples/Claps",
                        "Samples/808s"]  # Choosing random samples
         list_of_samples_names = [generator.get_random_file(i) for i in list_of_dir]
-        list_samp = generator.readSamples(list_of_samples_names)
+        list_samp = generator.read_samples(list_of_samples_names)
         instrumental, sample_rate, sample_width = generator.read_wav(
             generator.get_random_file("Samples2"))  # Choosing random melody
         channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
@@ -35,7 +36,7 @@ def get_text_messages(message):
                          "(не сжатые, иначе я их не смогу обработать), "
                          "а когда закончишь - напиши мне '3' и я скину результат")
         bot.send_message(message.from_user.id,
-                     'Пожалуйста не отправляйте длинные файлы, иначе я их обрежу! 3-7 секунд более чем достаточно, надо заливать состовляющие, а не целые симфонии)')
+                         'Пожалуйста не отправляйте длинные файлы, иначе я их обрежу! 3-7 секунд более чем достаточно, надо заливать состовляющие, а не целые симфонии)')
 
     if message.text == "3":
         list_of_samples_names = database.get_by_id(message.from_user.id)
@@ -47,7 +48,7 @@ def get_text_messages(message):
             return
 
         bot.send_message(message.from_user.id, "Try to open your files....")
-        list_samp = generator.readSamples(list_of_samples_names)
+        list_samp = generator.read_samples(list_of_samples_names)
         bot.send_message(message.from_user.id, "Cooking up....")
 
         # instrumental, sample_rate, sample_width = generator.read_wav(generator.get_random_file("Samples2"))

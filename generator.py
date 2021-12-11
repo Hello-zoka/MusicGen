@@ -19,10 +19,11 @@ OUTPUT_FILE = "not_so_random.wav"
 # Clap - 1
 # Melody - can't generate this so easy
 
-def get_random_file(directory):  # Getting path to random file in directory
+def get_random_file(directory):
+    # getting path to random file in directory
     n = 0
     random.seed()
-    for root, dirs, files in os.walk(directory):
+    for root, _, files in os.walk(directory):
         for name in files:
             n += 1
             if random.uniform(0, n) < 1:
@@ -30,7 +31,8 @@ def get_random_file(directory):  # Getting path to random file in directory
     return rfile
 
 
-def sum_of_channels(channels, channels2):  # getting sum of two audio lines
+def sum_of_channels(channels, channels2):
+    # getting sum of two audio lines
     if len(channels[0]) < len(channels2[0]):
         channels, channels2 = channels2, channels
     result = [[0] * len(ch) for ch in channels]
@@ -44,29 +46,30 @@ def sum_of_channels(channels, channels2):  # getting sum of two audio lines
     return result
 
 
-def sum_of_channels_from_pos(channels, channels2, pos):  # add second audio line to the first from pos position
+def sum_of_channels_from_pos(channels, channels2, pos):
+    # add second audio line to the first from pos position
     n_channels = len(channels)
     for k in range(n_channels):
         for i in range(len(channels2[k])):
             if i + pos >= len(channels[k]):
                 print("ERROR!\n!\n!\n!\nfirst channel too small\n\n\n")
-                return channels
+                break
             channels[k][i + pos] += channels2[k][i]
 
     return channels
 
 
-def concatenate_of_channles(channel, channel2):  # concatenate two audios
+def concatenate_of_channles(channel, channel2):
+    # concatenate two audios
     for i in range(len(channel)):
         for j in channel2[i]:
             channel[i].append(j)
     return channel
 
 
-# Making loop with random pauses(from pause_time list) between beats. There are beats_count  beatsin one lopp.
-# Then looping it up to duration time
 def random_mix_of_beat(channel, sample_rate=44100, beats_count=5, duration=20, pause_time=[0.4, 0.6, 0.8, 1.]):
-    # print("Starting another sample...")
+    # Making loop with random pauses(from pause_time list) between beats. There are beats_count  beatsin one lopp.
+    # Then looping it up to duration time
     pause_len = [int(pause_time[i] * sample_rate) for i in range(len(pause_time))]
     random_pause = [pause_len[random.randint(0, len(pause_len) - 1)] for i in range(beats_count)]
     loop_duration = 0
@@ -80,11 +83,11 @@ def random_mix_of_beat(channel, sample_rate=44100, beats_count=5, duration=20, p
     for cur_pause in random_pause:
         delay += cur_pause
         result = sum_of_channels_from_pos(result, channel, delay)
-    # print("End Sample")
     return clear_back(result)
 
 
-def generate_music(list_of_channels, duration=20):  # getting list of audios and generating random beat
+def generate_music(list_of_channels, duration=20):
+    # getting list of audios and generating random beat
     result = [[], []]
     for i in range(len(list_of_channels)):
         channel = list_of_channels[i]
@@ -94,14 +97,14 @@ def generate_music(list_of_channels, duration=20):  # getting list of audios and
     return result
 
 
-def generate_notrnd_music(list_of_channels,
-                          duration=20):  # same as generate_music but trying to make smth not so random and pretty
+def generate_notrnd_music(list_of_channels, duration=20):
+    # same as generate_music but trying to make smth not so random and pretty
     result = [[], []]
     for i in range(len(list_of_channels)):
         channel = list_of_channels[i]
         pause_time = [0.4, 0.6, 0.8, 0.8, 0.9, 1., 1.1]
 
-        # for generating smth not so random
+        # for generating something not so random
         if i == 0:  # Hi Hat
             pause_time = [0.25, 0.25, 0.25, 0.4, 0.3, 0.2, 0.1]
         elif i == 1:  # Clap
@@ -117,7 +120,8 @@ def generate_notrnd_music(list_of_channels,
     return result
 
 
-def clear_back(channel):  # deleting silence from the end
+def clear_back(channel):
+    # deleting silence from the end
     bl = True
     while bl:
         for i in channel:
@@ -131,7 +135,7 @@ def clear_back(channel):  # deleting silence from the end
     return channel
 
 
-def cut_big_file(channels, sample_rate = 44100, max_duration = 5):
+def cut_big_file(channels, sample_rate=44100, max_duration=5):
     result = [[] for i in range(len(channels))]
     mx_len = sample_rate * max_duration
     for i in range(len(channels)):
@@ -140,8 +144,8 @@ def cut_big_file(channels, sample_rate = 44100, max_duration = 5):
     return result
 
 
-
-def readSamples(list_of_samples=INPUT_FILE_LIST):  # reading audio lines from list of files
+def read_samples(list_of_samples=INPUT_FILE_LIST):
+    # reading audio lines from list of files
     res = []
     for i in list_of_samples:
         channels, sample_rate, sample_width = read_wav(i)
@@ -221,7 +225,6 @@ def check_result(channel_samples):
             print('Ошибка: количество сэмплов в каналах 1 ({}) и {} ({}) не совпадает'.format(len_0, i + 1, len_i))
             return False
 
-    # TODO: слишком большие сэмплы
     return True
 
 
