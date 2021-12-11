@@ -3,10 +3,6 @@ import wave
 import random
 import os
 
-INPUT_FILE = "Samples2/MV2 - STR Vibra.wav"
-INPUT_FILE2 = "sounds/mad-world.wav"
-INPUT_FILE_LIST = ["Samples/Cymbals/Hihat Closed 031 Super Hero Music.wav", "Samples/Claps/Clap 018 Cardiak.wav",
-                   "Samples/Kick Drums/Kick Drum 001 Tight.wav", "Samples/808s/808 Bass G#m Boom Kick Hi.wav"]
 
 OUTPUT_FILE = "not_so_random.wav"
 
@@ -144,7 +140,7 @@ def cut_big_file(channels, sample_rate=44100, max_duration=5):
     return result
 
 
-def read_samples(list_of_samples=INPUT_FILE_LIST):
+def read_samples(list_of_samples):
     # reading audio lines from list of files
     res = []
     for i in list_of_samples:

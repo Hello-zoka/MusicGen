@@ -26,7 +26,7 @@ def get_text_messages(message):
         list_of_samples_names = [generator.get_random_file(i) for i in list_of_dir]
         list_samp = generator.read_samples(list_of_samples_names)
         instrumental, sample_rate, sample_width = generator.read_wav(
-            generator.get_random_file("Samples2"))  # Choosing random melody
+            generator.get_random_file("Instrumatal samples"))  # Choosing random melody
         channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
         generator.write_wav("bot_result.wav", channels_out, 44100, 2)
         bot.send_audio(message.from_user.id, audio=open("bot_result.wav", 'rb'))
@@ -51,7 +51,7 @@ def get_text_messages(message):
         list_samp = generator.read_samples(list_of_samples_names)
         bot.send_message(message.from_user.id, "Cooking up....")
 
-        # instrumental, sample_rate, sample_width = generator.read_wav(generator.get_random_file("Samples2"))
+        # instrumental, sample_rate, sample_width = generator.read_wav(generator.get_random_file("Instrumatal samples"))
         # channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
         generator.write_wav("bot_result.wav", generator.generate_music(list_samp), 44100, 2)
         bot.send_audio(message.from_user.id, audio=open("bot_result.wav", 'rb'))
