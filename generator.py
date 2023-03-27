@@ -3,7 +3,6 @@ import wave
 import random
 import os
 
-
 OUTPUT_FILE = "not_so_random.wav"
 
 

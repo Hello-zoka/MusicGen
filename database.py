@@ -16,6 +16,7 @@ try:
 except:
     print("Error while creating table")
 
+
 def insert(id, path):
     id = str(id)
     try:
@@ -24,6 +25,7 @@ def insert(id, path):
         print("commited")
     except:
         print("Error inserting into table")
+
 
 def get_by_id(id):
     id = str(id)
@@ -38,6 +40,7 @@ def get_by_id(id):
         print("Error get by id")
     return result
 
+
 def clear(id):
     id = str(id)
     try:
@@ -45,4 +48,3 @@ def clear(id):
         conn.commit()
     except:
         print("Error while deleting")
-
