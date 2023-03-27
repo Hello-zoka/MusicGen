@@ -6,6 +6,8 @@ Here you can find a telegram bot that generates a simple melody from given sound
 
 Sometimes bot can unavaliable, please dm me in telegram `@hello_zoka` and I will revive it.
 
+Nowadays I have really slow hosting service, so generation of music can take a lot more time, comparing to running bot locally. Please be patient or run bot on your computer x)
+
 
 ## How to use
 
