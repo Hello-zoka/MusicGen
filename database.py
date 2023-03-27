@@ -1,7 +1,7 @@
 import psycopg2
 
 try:
-    conn = psycopg2.connect(dbname='music_audio', user='yurij', password='', host='localhost')
+    conn = psycopg2.connect(dbname='name_of_base', user='iurii', password='', host='')
     cursor = conn.cursor()
     print("connected to db")
 except:
@@ -9,12 +9,12 @@ except:
     exit()
 
 # need to create postgresql database at first launch
-# try:
-#     cursor.execute('''CREATE TABLE audio(id varchar(40), listOfPaths varchar(200));''')
-#     conn.commit()
-#     print("created table")
-# except:
-#     print("Error while creating table")
+try:
+    cursor.execute('''CREATE TABLE IF NOT EXISTS audio(id varchar(40), listOfPaths varchar(200));''')
+    conn.commit()
+    print("created table")
+except:
+    print("Error while creating table")
 
 def insert(id, path):
     id = str(id)
