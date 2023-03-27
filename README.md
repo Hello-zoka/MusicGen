@@ -1,8 +1,11 @@
 # Music Generator Bot
 
-**https://t.me/music_gen_bot**
-
 Here you can find a telegram bot that generates a simple melody from given sounds.
+
+[Link to bot](https://t.me/music_gen_bot)
+
+Sometimes bot can unavaliable, please dm me in telegram `@hello_zoka` and I will revive it.
+
 
 ## How to use
 
