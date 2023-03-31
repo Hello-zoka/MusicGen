@@ -36,7 +36,7 @@ def sum_of_channels(channels, channels2):
     for k in range(n_channels):
         for i in range(len(channels[k])):
             result[k][i] = channels[k][i]
-            if (k < len(channels2) and i < len(channels2[k])):
+            if k < len(channels2) and i < len(channels2[k]):
                 result[k][i] += channels2[k][i]
     return result
 
@@ -54,7 +54,7 @@ def sum_of_channels_from_pos(channels, channels2, pos):
     return channels
 
 
-def concatenate_of_channles(channel, channel2):
+def concatenate_of_channels(channel, channel2):
     # concatenate two audios
     for i in range(len(channel)):
         for j in channel2[i]:
@@ -63,17 +63,17 @@ def concatenate_of_channles(channel, channel2):
 
 
 def random_mix_of_beat(channel, sample_rate=44100, beats_count=5, duration=20, pause_time=[0.4, 0.6, 0.8, 1.]):
-    # Making loop with random pauses(from pause_time list) between beats. There are beats_count  beatsin one lopp.
+    # Making loop with random pauses(from pause_time list) between beats. There are beats_count  beats one loop.
     # Then looping it up to duration time
     pause_len = [int(pause_time[i] * sample_rate) for i in range(len(pause_time))]
-    random_pause = [pause_len[random.randint(0, len(pause_len) - 1)] for i in range(beats_count)]
+    random_pause = [pause_len[random.randint(0, len(pause_len) - 1)] for _ in range(beats_count)]
     loop_duration = 0
     loop_size = len(random_pause)
     for i in random_pause:
         loop_duration += i
     for j in range(((duration * sample_rate) // loop_duration) * loop_size):
         random_pause.append(random_pause[j])
-    result = [[0 for i in range(sample_rate * (duration * 5 // 2) + len(channel[j]))] for j in range(len(channel))]
+    result = [[0 for _ in range(sample_rate * (duration * 5 // 2) + len(channel[j]))] for j in range(len(channel))]
     delay = 0
     for cur_pause in random_pause:
         delay += cur_pause
@@ -87,7 +87,7 @@ def generate_music(list_of_channels, duration=20):
     for i in range(len(list_of_channels)):
         channel = list_of_channels[i]
         pause_time = [0.4, 0.6, 0.8, 0.8, 0.9, 1., 1.1]
-        loop_sample = clear_back(random_mix_of_beat(channel, duration=duration, beats_count=10, pause_time=pause_time))
+        loop_sample = random_mix_of_beat(channel, duration=duration, beats_count=10, pause_time=pause_time)
         result = sum_of_channels(loop_sample, result)
     return result
 
@@ -131,7 +131,7 @@ def clear_back(channel):
 
 
 def cut_big_file(channels, sample_rate=44100, max_duration=5):
-    result = [[] for i in range(len(channels))]
+    result = [[] for _ in range(len(channels))]
     mx_len = sample_rate * max_duration
     for i in range(len(channels)):
         for j in range(min(mx_len, len(channels[i]))):
@@ -158,10 +158,10 @@ def read_wav(filename):
         wav_file = wave.open(filename, 'r')
     except wave.Error:
         print("ERROR\n!\n!\n!\n!\n!\n" + filename)
-        channels = [[0 for i in range(44100 * 3)] for j in range(2)]
+        channels = [[0 for _ in range(44100 * 3)] for _ in range(2)]
         return channels, 44100, 2
     # print("Trying to open: ", filename, end=' ')
-    # print("Succes!")
+    # print("Success!")
 
     n_channels = wav_file.getnchannels()
     # print('Количество каналов:', n_channels)

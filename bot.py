@@ -13,7 +13,9 @@ bot = TeleBot(token)
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.reply_to(message,
-                 'Привет, ' + message.from_user.first_name + '! Я бот, который умеет генерировать простенькую музыку, напиши мне "1" и я покажу что умею, или напиши "2" и попробуем что-то сделать из твоих звуков!')
+                 'Привет, ' + message.from_user.first_name + '! Я бот, который умеет генерировать простенькую музыку, '
+                                                             'напиши мне "1" и я покажу что умею, или напиши "2" и '
+                                                             'попробуем что-то сделать из твоих звуков!')
 
 
 @bot.message_handler(content_types=['text'])
@@ -26,7 +28,7 @@ def get_text_messages(message):
         list_of_samples_names = [generator.get_random_file(i) for i in list_of_dir]
         list_samp = generator.read_samples(list_of_samples_names)
         instrumental, sample_rate, sample_width = generator.read_wav(
-            generator.get_random_file("Instrumatal samples"))  # Choosing random melody
+            generator.get_random_file("Instrumental samples"))  # Choosing random melody
         channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
         generator.write_wav("bot_result.wav", channels_out, 44100, 2)
         bot.send_audio(message.from_user.id, audio=open("bot_result.wav", 'rb'))
@@ -36,7 +38,8 @@ def get_text_messages(message):
                          "(не сжатые, иначе я их не смогу обработать), "
                          "а когда закончишь - напиши мне '3' и я скину результат")
         bot.send_message(message.from_user.id,
-                         'Пожалуйста не отправляйте длинные файлы, иначе я их обрежу! 3-7 секунд более чем достаточно, надо заливать состовляющие, а не целые симфонии)')
+                         'Пожалуйста не отправляйте длинные файлы, иначе я их обрежу! '
+                         '3-7 секунд более чем достаточно, надо заливать состовляющие, а не целые симфонии)')
 
     if message.text == "3":
         list_of_samples_names = database.get_by_id(message.from_user.id)
@@ -44,14 +47,15 @@ def get_text_messages(message):
         if len(list_of_samples_names) == 0:
             bot.send_message(message.from_user.id,
                              "Ты не отправил файлы или что-то сломалось;("
-                             "А еще я медленный, так что может быть просто не успел все обработать\nЯ скажу, когда получу файлы, не спеши.")
+                             "А еще я медленный, так что может быть просто не успел все обработать\n"
+                             "Я скажу, когда получу файлы, не спеши.")
             return
 
         bot.send_message(message.from_user.id, "Try to open your files....")
         list_samp = generator.read_samples(list_of_samples_names)
         bot.send_message(message.from_user.id, "Cooking up....")
 
-        # instrumental, sample_rate, sample_width = generator.read_wav(generator.get_random_file("Instrumatal samples"))
+        # instrumental, sample_rate, sample_width = generator.read_wav(generator.get_random_file("Instrumental samples"))
         # channels_out = generator.sum_of_channels(generator.generate_notrnd_music(list_samp), instrumental)
         generator.write_wav("bot_result.wav", generator.generate_music(list_samp), 44100, 2)
         bot.send_audio(message.from_user.id, audio=open("bot_result.wav", 'rb'))
@@ -68,9 +72,9 @@ def handle_docs_document(message):
     with open(filename, 'wb') as f:
         f.write(file.content)
     try:
-        wav_file = wave.open(filename, 'r')
+        wave.open(filename, 'r')
     except wave.Error:
-        print("Incorret file" + filename)
+        print("Incorrect file" + filename)
         bot.send_message(message.from_user.id, "Ну и что за хрень ты скинул?")
         return
     database.insert(message.from_user.id, filename)
@@ -88,10 +92,9 @@ def handle_docs_document(message):
     with open(filename, 'wb') as f:
         f.write(file.content)
     try:
-        wav_file = wave.open(filename, 'r')
-
+        wave.open(filename, 'r')
     except wave.Error:
-        print("Incorret file " + filename)
+        print("Incorrect file " + filename)
         bot.send_message(message.from_user.id, "Ну и что за хрень ты скинул, да еще и документ а не аудио?")
         return
     database.insert(message.from_user.id, filename)
